@@ -1,0 +1,26 @@
+function prob=concave_den_cdf(ref_Y, ref_phi, ref_beta, Delta_vec, T, x)
+% this function calculates the cdf of semi-parametric distribution
+
+upper = (sqrt(T) - sqrt(x)) / sqrt(x);
+if upper > ref_Y(end)
+    prob = 1;
+elseif upper <= ref_Y(1)
+    prob = 0;
+else
+    phi_temp = linear_phi_inter(ref_Y, ref_phi, upper);
+    A_val=cal_A_val(ref_Y, ref_beta, ref_phi, Delta_vec, [sqrt(x),1]);
+    ind=find(ref_Y==upper);
+    if isempty(ind)
+        ind=sum(ref_Y<upper);
+        ref_Y_temp=[ref_Y(1:ind)',upper]';
+        ref_phi_temp=[ref_phi(1:ind)',phi_temp]';
+        Delta_vec_temp=ref_Y_temp(2:end)-ref_Y_temp(1:end-1);
+    else
+        ref_Y_temp=ref_Y(1:ind);
+        ref_phi_temp=ref_phi(1:ind);
+        Delta_vec_temp=ref_Y_temp(2:end)-ref_Y_temp(1:end-1);
+    end
+    A_val_partial=cal_A_val(ref_Y_temp,ref_beta,ref_phi_temp,Delta_vec_temp...
+        ,[sqrt(x),1]);
+    prob=exp(A_val_partial)/exp(A_val);
+end
