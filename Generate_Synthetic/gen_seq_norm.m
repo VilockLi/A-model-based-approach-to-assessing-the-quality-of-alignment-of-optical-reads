@@ -1,0 +1,10 @@
+function [gen_seq, ori_seq] = gen_seq_norm(seq, mu, sigma, T)
+seq = seq(:);
+m = length(seq);
+rand_vec = normrnd(mu, sigma, [m, 1]);
+gen_seq = sqrt(seq).*(ones(m,1) + rand_vec);
+gen_seq = gen_seq.^2;
+idx = find(gen_seq < T);
+seq(idx) = nan;
+ori_seq = seq;
+gen_seq(idx) = nan;
