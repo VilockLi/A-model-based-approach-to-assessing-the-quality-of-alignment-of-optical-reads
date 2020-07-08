@@ -1,0 +1,92 @@
+function all_seq=extract_seq(ref,observed_seq,step_size,upper)
+% all possible sequences, all_seq includes the start point, end point,
+% reference ID, and the sequence contained in [start point, end point]
+n = length(observed_seq);
+[m, ID] = size(ref);
+all_seq = cell(ID, 1);
+for i = 1:1
+    sub_seq = cell(1);
+    L = sum(ref(1:end, i));
+    cul_ref = cul_sum(ref(1:end, i));
+    minisize = inf;
+    count = inf;
+    for j = 1:m - n + 1
+        temp_sum = sum(ref(j:j + n - 1, i));
+        if temp_sum <= minisize
+            minisize = temp_sum;
+            count = j;
+        end
+    end 
+    count = 1;
+    for b = 1:step_size:L - minisize
+        for e = b+minisize - 1:step_size:L
+            sub_seq{count,1} = b;
+            sub_seq{count,2} = e;
+            sub_seq{count,3} = i;
+            ind_1 = find(cul_ref <= b);
+            ind_2 = find(cul_ref <= e);
+            ind_3 = find(cul_ref == e);
+            ind_4 = find(cul_ref == b);           
+            if isempty(ind_1) && isempty(ind_2)
+                sub_seq{count, 4} = [];
+            elseif isempty(ind_1) && ~isempty(ind_2)
+                ind_2 = ind_2(end);
+                if ~isempty(ind_3)
+                    if ind_3 >= n && ind_3 <= n + upper
+                        sub_seq{count, 4} = [ref(1, i) - b, ref(2:ind_3, i)'];
+                    else
+                        sub_seq{count, 4}=[];
+                    end
+                elseif ind_2 >= n-1 && ind_2 <= n - 1 + upper
+                    sub_seq{count, 4} = [ref(1, i)-b, ref(2:ind_2, i)', e - cul_ref(ind_2)];
+                else
+                    sub_seq{count, 4} = [];
+                end
+            else 
+                ind_2=ind_2(end);
+                ind_1=ind_1(end);
+                if ~isempty(ind_3) && ~isempty(ind_4)
+                    if (ind_2-ind_1)>=n && ind_3 <= n+upper
+                        sub_seq{count,4}=[ref(ind_1+1:ind_2,i)'];
+                    else
+                        sub_seq{count,4}=[];
+                    end
+                elseif isempty(ind_3) && ~isempty(ind_4)
+                    if (ind_2-ind_1) >= n-1 && (ind_2-ind_1) <= n-1+upper
+                        sub_seq{count, 4} = [ref(ind_1 + 1:ind_2, i)', e - cul_ref(ind_2)];
+                    else
+                        sub_seq{count, 4} = [];
+                    end
+                elseif isempty(ind_3) && isempty(ind_4)
+                     if (ind_2-ind_1) >= n - 1 && (ind_2 - ind_1) <= n-1+upper
+                        sub_seq{count,4} = [cul_ref(ind_1+1)-b,ref(ind_1 + 2:ind_2, i)', e - cul_ref(ind_2)];
+                    else
+                        sub_seq{count,4} = [];
+                     end
+                else ~isempty(ind_3) && isempty(ind_4)
+                     if (ind_2-ind_1) >= n && (ind_2-ind_1) <= n+upper
+                        sub_seq{count,4} = [cul_ref(ind_1 + 1) - b, ref(ind_1 + 2:ind_2, i)'];
+                    else
+                        sub_seq{count,4} = [];
+                     end
+                end
+            end
+            count = count + 1;
+            display(count)
+            display(i)
+        end
+    end
+    all_seq{i} = sub_seq;
+end
+
+                    
+                    
+
+                    
+                
+                    
+                        
+                    
+                    
+                
+            
