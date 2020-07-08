@@ -277,3 +277,8 @@ for id_num_loop = 1
     end
     id_num_loop
 end
+
+%% The candidates are stored in all_data, ranked by their corresponding posterior likelihoods.
+all_data = array2table(all_data);
+all_data.Properties.VariableNames(1:end) = {'id', 'normalizing_constant',...
+    'length_of_read', 'number_of_candidates', 'start_pos', 'end_pos', 'posterior_likelihood'};
